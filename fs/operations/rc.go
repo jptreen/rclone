@@ -224,9 +224,10 @@ func rcSingleCommand(ctx context.Context, in rc.Params, name string, noRemote bo
 			return nil, err
 		}
 		autoFilename, _ := in.GetBool("autoFilename")
+		autoFilenameHeader, _ := in.GetBool("autoFilenameHeader")
 		noClobber, _ := in.GetBool("noClobber")
 
-		_, err = CopyURL(ctx, f, remote, url, autoFilename, noClobber)
+		_, err = CopyURL(ctx, f, remote, url, autoFilename, autoFilenameHeader, noClobber)
 		return nil, err
 	case "uploadfile":
 

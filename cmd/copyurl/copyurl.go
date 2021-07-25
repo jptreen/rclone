@@ -14,10 +14,11 @@ import (
 )
 
 var (
-	autoFilename  = false
-	printFilename = false
-	stdout        = false
-	noClobber     = false
+	autoFilename       = false
+	printFilename      = false
+	autoFilenameHeader = false
+	stdout             = false
+	noClobber          = false
 )
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 	cmdFlags := commandDefinition.Flags()
 	flags.BoolVarP(cmdFlags, &autoFilename, "auto-filename", "a", autoFilename, "Get the file name from the URL and use it for destination file path")
 	flags.BoolVarP(cmdFlags, &printFilename, "print-filename", "p", printFilename, "Print the resulting name from --auto-filename")
+	flags.BoolVarP(cmdFlags, &autoFilenameHeader, "auto-filename-header", "", autoFilenameHeader, "Override output of --auto-filename with data from HTTP Content-Disposition header")
 	flags.BoolVarP(cmdFlags, &noClobber, "no-clobber", "", noClobber, "Prevent overwriting file with same name")
 	flags.BoolVarP(cmdFlags, &stdout, "stdout", "", stdout, "Write the output to stdout rather than a file")
 }
@@ -39,7 +41,8 @@ it in temporary storage.
 Setting ` + "`--auto-filename`" + ` will cause the file name to be retrieved from
 the URL (after any redirections) and used in the destination
 path. With ` + "`--print-filename`" + ` in addition, the resulting file name will
-be printed.
+be printed. With ` + "`--auto-filename-header`" +` in addition, if a specific filename
+is set in HTTP headers, it will be used instead of the name from the URL.
 
 Setting ` + "`--no-clobber`" + ` will prevent overwriting file on the 
 destination if there is one with the same name.
@@ -69,7 +72,7 @@ will cause the output to be written to standard output.
 			if stdout {
 				err = operations.CopyURLToWriter(context.Background(), args[0], os.Stdout)
 			} else {
-				dst, err = operations.CopyURL(context.Background(), fsdst, dstFileName, args[0], autoFilename, noClobber)
+				dst, err = operations.CopyURL(context.Background(), fsdst, dstFileName, args[0], autoFilename, autoFilenameHeader, noClobber)
 				if printFilename && err == nil && dst != nil {
 					fmt.Println(dst.Remote())
 				}
